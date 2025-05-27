@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cupcake Personality Test</title>
+  <style>
+    body { font-family: 'Patrick Hand', sans-serif; background: #fff5f8; color: #333; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #container { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 2rem; width: 90%; max-width: 400px; text-align: center; }
+    h1 { margin-top: 0; font-size: 2rem; }
+    button { background: #ff9ccf; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+    button:hover { opacity: 0.9; }
+    .hidden { display: none; }
+    .question { margin-bottom: 1.5rem; text-align: left; }
+    .question h2 { font-size: 1.2rem; }
+    .options { list-style: none; padding: 0; }
+    .options li { margin: 0.5rem 0; }
+    .options input { margin-right: 0.5rem; }
+    #result img { width: 150px; height: auto; margin: 1rem 0; }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="container">
+    <div id="home-screen">
+      <h1>🧁 Cupcake Quiz</h1>
+      <p>Find out what kind of cupcake you are!</p>
+      <button id="start-btn">Start the Test</button>
+    </div>
+    <div id="quiz-screen" class="hidden">
+      <form id="quiz-form">
+        <div class="question" data-q="0">
+          <h2>1. Your ideal Sunday includes:</h2>
+          <ul class="options">
+            <li><label><input type="radio" name="q0" value="0"> A nap longer than your degree</label></li>
+            <li><label><input type="radio" name="q0" value="1"> World domination... in PJs</label></li>
+            <li><label><input type="radio" name="q0" value="2"> Baking, obviously</label></li>
+            <li><label><input type="radio" name="q0" value="3"> Watching animal videos for 3 hours</label></li>
+          </ul>
+        </div>
+        <div class="question" data-q="1">
+          <h2>2. Pick a sidekick:</h2>
+          <ul class="options">
+            <li><label><input type="radio" name="q1" value="0"> A hyperactive squirrel</label></li>
+            <li><label><input type="radio" name="q1" value="1"> A sentient teacup</label></li>
+            <li><label><input type="radio" name="q1" value="2"> A sarcastic AI</label></li>
+            <li><label><input type="radio" name="q1" value="3"> My blanket</label></li>
+          </ul>
+        </div>
+        <div class="question" data-q="2">
+          <h2>3. Your biggest weakness:</h2>
+          <ul class="options">
+            <li><label><input type="radio" name="q2" value="0"> Free food</label></li>
+            <li><label><input type="radio" name="q2" value="1"> Shiny buttons</label></li>
+            <li><label><input type="radio" name="q2" value="2"> Random Wikipedia spirals</label></li>
+            <li><label><input type="radio" name="q2" value="3"> That one pigeon who looked at you funny</label></li>
+          </ul>
+        </div>
+        <button type="button" id="submit-btn">See My Cupcake</button>
+      </form>
+    </div>
+    <div id="result-screen" class="hidden">
+      <h1>Your Cupcake Type:</h1>
+      <div id="result">
+        <img src="" alt="Cupcake Image" id="cupcake-img">
+        <h2 id="cupcake-name"></h2>
+        <p id="cupcake-desc"></p>
+      </div>
+      <button id="restart-btn">Try Again</button>
+    </div>
+  </div>
+  <script>
+    const startBtn = document.getElementById('start-btn');
+    const home = document.getElementById('home-screen');
+    const quiz = document.getElementById('quiz-screen');
+    const result = document.getElementById('result-screen');
+    const submitBtn = document.getElementById('submit-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    const cupcakes = [
+      { name: 'The Forgotten Cupcake', desc: 'Sweet and lovable, but always left behind in the fridge.', img: 'https://i.imgur.com/9JYpXfE.png' },
+      { name: 'The Drama Cupcake', desc: 'Extra frosting, extra opinions.', img: 'https://i.imgur.com/3r1KX7o.png' },
+      { name: 'The Midnight Snack Cupcake', desc: 'Unexpected. Mysterious. Eaten at 3am.', img: 'https://i.imgur.com/2Jp4v0T.png' },
+      { name: 'The Cupcake CEO', desc: 'Frosted, focused, and firing off emails.', img: 'https://i.imgur.com/5F3Hh2l.png' }
+    ];
+
+    startBtn.onclick = () => {
+      home.classList.add('hidden'); quiz.classList.remove('hidden');
+    };
+
+    submitBtn.onclick = () => {
+      const answers = Array.from({ length: 3 }, (_, i) => {
+        const checked = document.querySelector(`input[name='q${i}']:checked`);
+        return checked ? parseInt(checked.value) : 0;
+      });
+      const sum = answers.reduce((a, b) => a + b, 0);
+      const idx = sum % cupcakes.length;
+      document.getElementById('cupcake-img').src = cupcakes[idx].img;
+      document.getElementById('cupcake-name').innerText = cupcakes[idx].name;
+      document.getElementById('cupcake-desc').innerText = cupcakes[idx].desc;
+      quiz.classList.add('hidden'); result.classList.remove('hidden');
+    };
+
+    restartBtn.onclick = () => {
+      result.classList.add('hidden'); home.classList.remove('hidden');
+      document.getElementById('quiz-form').reset();
+    };
+  </script>
+</body>
+</html>
