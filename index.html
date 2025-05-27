@@ -8,15 +8,22 @@
     body { font-family: 'Patrick Hand', sans-serif; background: #fff5f8; color: #333; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
     #container { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 2rem; width: 90%; max-width: 400px; text-align: center; }
     h1 { margin-top: 0; font-size: 2rem; }
-    button { background: #ff9ccf; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
-    button:hover { opacity: 0.9; }
+    button, a.button { background: #ff9ccf; color: #333; text-decoration: none; display: inline-block; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+    button:hover, a.button:hover { opacity: 0.9; }
     .hidden { display: none; }
     .question { margin-bottom: 1.5rem; text-align: left; }
     .question h2 { font-size: 1.2rem; }
     .options { list-style: none; padding: 0; }
     .options li { margin: 0.5rem 0; }
     .options input { margin-right: 0.5rem; }
-    #result img { width: 150px; height: auto; margin: 1rem 0; }
+    #result img { width: 150px; height: auto; margin: 1rem 0; animation: popIn 0.6s ease-out; }
+    @keyframes popIn {
+      0%   { transform: scale(0); }
+      70%  { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .tip { font-size: 0.9rem; margin-top: 1rem; color: #555; }
+    #share-btn { margin-top: 0.5rem; }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
 </head>
@@ -65,10 +72,17 @@
         <img src="" alt="Cupcake Image" id="cupcake-img">
         <h2 id="cupcake-name"></h2>
         <p id="cupcake-desc"></p>
+        <p class="tip"></p>
+        <audio id="taDa" src="ta-da.mp3" preload="auto"></audio>
+        <button id="share-btn" class="button">Share on Instagram</button>
       </div>
       <button id="restart-btn">Try Again</button>
     </div>
   </div>
+
+  <!-- Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
   <script>
     const startBtn = document.getElementById('start-btn');
     const home = document.getElementById('home-screen');
@@ -76,6 +90,7 @@
     const result = document.getElementById('result-screen');
     const submitBtn = document.getElementById('submit-btn');
     const restartBtn = document.getElementById('restart-btn');
+    const shareBtn = document.getElementById('share-btn');
 
     const cupcakes = [
       { name: 'The Forgotten Cupcake', desc: 'Sweet and lovable, but always left behind in the fridge.', img: 'https://i.imgur.com/9JYpXfE.png' },
@@ -84,8 +99,15 @@
       { name: 'The Cupcake CEO', desc: 'Frosted, focused, and firing off emails.', img: 'https://i.imgur.com/5F3Hh2l.png' }
     ];
 
+    const tips = [
+      'Tip: A pinch of salt enhances sweetness!',
+      'Fun fact: Cupcakes date back to 1796!',
+      'Pro tip: Don’t overfill liners—80% is perfect!'
+    ];
+
     startBtn.onclick = () => {
-      home.classList.add('hidden'); quiz.classList.remove('hidden');
+      home.classList.add('hidden');
+      quiz.classList.remove('hidden');
     };
 
     submitBtn.onclick = () => {
@@ -95,15 +117,41 @@
       });
       const sum = answers.reduce((a, b) => a + b, 0);
       const idx = sum % cupcakes.length;
+
       document.getElementById('cupcake-img').src = cupcakes[idx].img;
       document.getElementById('cupcake-name').innerText = cupcakes[idx].name;
       document.getElementById('cupcake-desc').innerText = cupcakes[idx].desc;
-      quiz.classList.add('hidden'); result.classList.remove('hidden');
+      document.getElementById('taDa').play();
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      document.querySelector('.tip').innerText = tips[Math.floor(Math.random() * tips.length)];
+
+      quiz.classList.add('hidden');
+      result.classList.remove('hidden');
+    };
+
+    shareBtn.onclick = async () => {
+      const idx = parseInt(cupcakes.findIndex(c => c.name === document.getElementById('cupcake-name').innerText));
+      const shareData = {
+        title: 'My Cupcake Personality',
+        text: `I’m a ${cupcakes[idx].name}! What cupcake are you?`,
+        url: window.location.href
+      };
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          alert('Sharing failed. You can copy the link manually: ' + window.location.href);
+        }
+      } else {
+        prompt('Copy this link to share on Instagram:', window.location.href);
+      }
     };
 
     restartBtn.onclick = () => {
-      result.classList.add('hidden'); home.classList.remove('hidden');
+      result.classList.add('hidden');
+      home.classList.remove('hidden');
       document.getElementById('quiz-form').reset();
+      document.querySelector('.tip').innerText = '';
     };
   </script>
 </body>
